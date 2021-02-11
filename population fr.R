@@ -81,9 +81,10 @@ pop %>% ACF(`mortalité_1M_hab`) %>%autoplot()
 
 # forecasting
 pop_train<-pop %>%
-  slice(1:(n()-5))
+  filter(Année<2018 & Année>=2004)
+  # slice(1:(n()-5))
 pop_test<-pop %>%
-  filter(Année>2015)
+  filter(Année>2017)
 
 fit<-pop_train %>%
   model(ets=ETS(mortalité_1M_hab ~ trend("A")+error("A")),
@@ -101,7 +102,12 @@ fit %>% augment()%>%
 accuracy(fit)
 
 # forecast accuracy
-fit %>% forecast(h=5) %>% accuracy(pop_test)  
+f<-fit %>% forecast(h=3) 
+f %>% accuracy(pop_test)  
 
 # plot forecast
-fit %>% forecast(h=5) %>% autoplot(pop)
+f %>% autoplot(pop)
+f %>% filter(Année==2020)
+pop_test %>% filter(Année==2020) %>% select(mortalité_1M_hab)
+
+70000/67
