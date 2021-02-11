@@ -4,7 +4,6 @@ library(tsibble)
 library(feasts)
 library(fable)
 
-
 # Population structure
 popStruct<-read_xlsx("sources/fe_dod_struct_pop.xlsx", skip=3)[,1:8]
 names(popStruct)<-c("Année", "...2", "15-19","0-14","20-59","60-64","65-75","75+")
@@ -18,12 +17,12 @@ popTs<-popStruct[,1:8]%>%
   mutate(Année=as.integer(Année))%>%
   as_tsibble(index=Année)%>%
   pivot_longer(cols=-c(1,2),names_to="Ages", values_to="Qty", values_transform=list(integer))
-  
+
+#plot population per age bin  
 popTs %>%
   group_by(Ages)%>%
   summarise(Q=sum(Qty))%>%
   autoplot(Q)
-
 
 # Population review
 popCroiss<-read_xlsx("sources/fe_dod_compo_crois.xlsx",skip = 2)
@@ -47,7 +46,7 @@ pop %>%
 
 p1<-pop%>%
   ggplot()+
-  geom_line(aes(x=Année, y=`mortalité_10M_hab`))
+  geom_line(aes(x=Année, y=`mortalité_1M_hab`))
 p2<-pop %>%
   ggplot(aes(x=Année,y=`Population au 1er janvier`))+
   geom_line()
@@ -60,8 +59,6 @@ p3<-pop%>%
   scale_y_continuous(trans="log10")+
   ggrepel::geom_label_repel(aes(label = label), nudge_x = 1, na.rm = TRUE)
 
-library(gridExtra)
-grid.arrange(p1,p2,p3, ncol=1)
 
 library(patchwork)
 p1 / p2 / p3
